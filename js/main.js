@@ -2,6 +2,7 @@ document.documentElement.classList.add('js');
 
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+const desktopMenu = window.matchMedia('(min-width: 1081px)');
 
 // Menu mobile
 const toggle = document.querySelector('.nav-toggle');
@@ -13,8 +14,48 @@ toggle.addEventListener('click', () => {
   toggle.textContent = open ? 'Fermer' : 'Menu';
 });
 
+// Sous-menus : clic ou clavier partout, survol en plus sur ordinateur
+const subs = [...document.querySelectorAll('.has-sub')];
+
+function setSub(li, open) {
+  li.classList.toggle('is-open', open);
+  li.querySelector('.menu-btn').setAttribute('aria-expanded', open);
+}
+function closeSubs(except) { subs.forEach((li) => { if (li !== except) setSub(li, false); }); }
+
+subs.forEach((li) => {
+  const btn = li.querySelector('.menu-btn');
+  btn.addEventListener('click', () => {
+    const open = !li.classList.contains('is-open');
+    closeSubs(li);
+    setSub(li, open);
+  });
+  let timer;
+  li.addEventListener('pointerenter', (e) => {
+    if (e.pointerType !== 'mouse' || !desktopMenu.matches) return;
+    clearTimeout(timer); closeSubs(li); setSub(li, true);
+  });
+  li.addEventListener('pointerleave', (e) => {
+    if (e.pointerType !== 'mouse' || !desktopMenu.matches) return;
+    timer = setTimeout(() => setSub(li, false), 180);
+  });
+  li.addEventListener('focusout', (e) => {
+    if (!li.contains(e.relatedTarget)) setSub(li, false);
+  });
+});
+
+document.addEventListener('keydown', (e) => {
+  if (e.key !== 'Escape') return;
+  const open = subs.find((li) => li.classList.contains('is-open'));
+  if (open) { setSub(open, false); open.querySelector('.menu-btn').focus(); }
+});
+document.addEventListener('click', (e) => { if (!e.target.closest('.has-sub')) closeSubs(); });
+
+// Un lien du menu ferme le menu mobile
 nav.addEventListener('click', (e) => {
-  if (e.target.closest('a') && nav.classList.contains('is-open')) toggle.click();
+  if (!e.target.closest('a')) return;
+  closeSubs();
+  if (nav.classList.contains('is-open')) toggle.click();
 });
 
 // Défilement : navigation en verre, barre de progression, parallaxe du hero
@@ -23,8 +64,6 @@ const progress = document.querySelector('.progress');
 const hero = document.querySelector('.hero');
 const heroPitch = document.querySelector('.hero-pitch');
 const heroText = document.querySelector('.hero-text');
-const heroArt = document.querySelector('.hero-figure svg');
-const heroPhoto = document.querySelector('.hero-photo');
 
 let ticking = false;
 
@@ -39,8 +78,6 @@ function onScroll() {
     heroPitch.style.transform = `translate3d(0, ${y * 0.35}px, 0)`;
     heroText.style.transform = `translate3d(0, ${y * 0.18}px, 0)`;
     heroText.style.opacity = Math.max(0, 1 - y / (hero.offsetHeight * 0.9));
-    heroArt.style.transform = `translate3d(0, ${y * 0.08}px, 0)`;
-    heroPhoto.style.transform = `translateY(${Math.min(30, y * 0.06)}px)`;
   }
   ticking = false;
 }
@@ -69,14 +106,50 @@ if (!reduceMotion && finePointer) {
   });
 }
 
+// Lignes de terrain en perspective : elles suivent doucement la souris
+if (!reduceMotion && finePointer) {
+  document.querySelectorAll('.pitch-3d').forEach((layer) => {
+    const section = layer.parentElement;
+    const svg = layer.querySelector('svg');
+    section.addEventListener('pointermove', (e) => {
+      const r = section.getBoundingClientRect();
+      svg.style.setProperty('--tx', ((e.clientX - r.left) / r.width - 0.5).toFixed(3));
+      svg.style.setProperty('--ty', ((e.clientY - r.top) / r.height - 0.5).toFixed(3));
+    });
+    section.addEventListener('pointerleave', () => {
+      svg.style.setProperty('--tx', 0); svg.style.setProperty('--ty', 0);
+    });
+  });
+}
+
+// Tuiles : elles s'inclinent en 3D vers la souris
+if (finePointer && !reduceMotion) {
+  document.querySelectorAll('.tile').forEach((tile) => {
+    tile.addEventListener('pointermove', (e) => {
+      const r = tile.getBoundingClientRect();
+      const px = (e.clientX - r.left) / r.width;
+      const py = (e.clientY - r.top) / r.height;
+      const strength = tile.classList.contains('tile-main') ? 8 : 14;
+      tile.style.setProperty('--ry', `${(px - 0.5) * strength}deg`);
+      tile.style.setProperty('--rx', `${(0.5 - py) * strength}deg`);
+      tile.style.setProperty('--gx', `${px * 100}%`);
+      tile.style.setProperty('--gy', `${py * 100}%`);
+    });
+    tile.addEventListener('pointerleave', () => {
+      tile.style.setProperty('--rx', '0deg');
+      tile.style.setProperty('--ry', '0deg');
+    });
+  });
+}
+
 // Apparitions au scroll, en cascade à l'intérieur d'un même groupe
 if (!reduceMotion && 'IntersectionObserver' in window) {
   const groups = [
     ['.section h2, .section-lead, .history-title', 'reveal'],
     ['.prose p, .facts > div', 'reveal'],
     ['.timeline li', 'reveal-line'],
-    ['.labels > .card, .teams > .card, .steps > .card, .extras > .card, .people > .card', 'reveal'],
-    ['.pitch, .scoreboard, .docs, .bag, .kit li, .checklist li, .team-links, .map, .contact-form, address', 'reveal'],
+    ['.tiles > .tile, .labels > .card, .teams > .card, .steps > .card, .extras > .card, .people > .card', 'reveal'],
+    ['.kit-stage, .map-wrap, .docs, .bag, .kit li, .team-links, .contact-form, address', 'reveal'],
     ['.partners li', 'reveal'],
   ];
 
@@ -86,7 +159,7 @@ if (!reduceMotion && 'IntersectionObserver' in window) {
       const el = entry.target;
       el.classList.add('is-in');
       observer.unobserve(el);
-      // Une fois apparu, l'élément retrouve ses transitions normales (survol des cartes)
+      // Une fois apparu, l'élément retrouve ses transitions normales (survol)
       const delay = parseFloat(el.style.getPropertyValue('--d')) || 0;
       setTimeout(() => {
         el.classList.remove('reveal', 'reveal-line', 'is-in');
@@ -101,7 +174,7 @@ if (!reduceMotion && 'IntersectionObserver' in window) {
       const siblings = [...el.parentElement.children].filter((c) => c.matches(selector));
       const index = siblings.indexOf(el);
       el.classList.add(cls);
-      el.style.setProperty('--d', `${Math.min(index, 8) * 0.08}s`);
+      el.style.setProperty('--d', `${Math.min(index, 8) * 0.07}s`);
       observer.observe(el);
     });
   });
@@ -116,44 +189,6 @@ if (finePointer) {
       card.style.setProperty('--hy', `${e.clientY - r.top}px`);
     });
   });
-}
-
-// La crosse (curseur) dribble une balle : elle suit la souris et part au clic
-if (!reduceMotion && finePointer) {
-  const ball = document.querySelector('.dribble');
-  const spin = ball.querySelector('.spin');
-  const R = 8; // rayon affiché en px
-  let tx = -100, ty = -100;      // position visée : juste devant la palette de la crosse
-  let x = -100, y = -100;        // position de la balle
-  let vx = 0, vy = 0, angle = 0;
-  let lastX = 0, lastY = 0, dirX = 1, dirY = 0;
-
-  window.addEventListener('pointermove', (e) => {
-    const dx = e.clientX - lastX, dy = e.clientY - lastY;
-    const len = Math.hypot(dx, dy);
-    if (len > 2) { dirX = dx / len; dirY = dy / len; }
-    lastX = e.clientX; lastY = e.clientY;
-    tx = e.clientX + 9; ty = e.clientY - 2;
-    if (!ball.classList.contains('is-visible')) { x = tx; y = ty; }
-    ball.classList.add('is-visible');
-  }, { passive: true });
-  document.documentElement.addEventListener('pointerleave', () => ball.classList.remove('is-visible'));
-
-  // Un clic frappe la balle dans le sens du mouvement
-  window.addEventListener('pointerdown', (e) => {
-    if (e.target.closest('input, textarea, select, .pitch')) return;
-    vx += dirX * 26; vy += dirY * 26;
-  });
-
-  (function dribble() {
-    vx += (tx - x) * 0.05; vy += (ty - y) * 0.05;
-    vx *= 0.82; vy *= 0.82;
-    x += vx; y += vy;
-    angle += (vx / R) * (180 / Math.PI) * 0.5;
-    ball.style.transform = `translate3d(${x}px, ${y}px, 0)`;
-    spin.style.transform = `rotate(${angle}deg)`;
-    requestAnimationFrame(dribble);
-  })();
 }
 
 // Formulaire de contact : ouvre la messagerie avec un message prérempli

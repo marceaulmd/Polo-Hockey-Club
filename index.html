@@ -10,6 +10,14 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800;900&family=Figtree:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+      }
+    }
+  </script>
 </head>
 <body>
 
@@ -24,13 +32,28 @@
       <circle r="1.7"/>
     </g>
   </symbol>
+  <symbol id="lignes-terrain" viewBox="0 0 914 550">
+    <g fill="none" stroke="currentColor" stroke-width="4">
+      <rect x="2" y="2" width="910" height="546"/>
+      <line x1="457" y1="2" x2="457" y2="548"/>
+      <line x1="229" y1="2" x2="229" y2="548"/>
+      <line x1="685" y1="2" x2="685" y2="548"/>
+      <path d="M2 111 A146 146 0 0 1 148 257 L148 293 A146 146 0 0 1 2 439"/>
+      <path d="M912 111 A146 146 0 0 0 766 257 L766 293 A146 146 0 0 0 912 439"/>
+      <path d="M2 61 A196 196 0 0 1 198 257 L198 293 A196 196 0 0 1 2 489" stroke-dasharray="14 16"/>
+      <path d="M912 61 A196 196 0 0 0 716 257 L716 293 A196 196 0 0 0 912 489" stroke-dasharray="14 16"/>
+    </g>
+    <g fill="currentColor"><circle cx="64" cy="275" r="6"/><circle cx="850" cy="275" r="6"/><circle cx="457" cy="275" r="6"/></g>
+  </symbol>
 </svg>
 
 <div class="progress" aria-hidden="true">
   <span class="progress-line"></span>
   <svg class="progress-ball" viewBox="-12 -12 24 24"><g class="spin"><use href="#balle"/></g><circle cx="-4" cy="-5" r="3" fill="#fff" opacity=".45"/></svg>
 </div>
-<svg class="dribble" viewBox="-12 -12 24 24" aria-hidden="true"><g class="spin"><use href="#balle"/></g><circle cx="-4" cy="-5" r="3" fill="#fff" opacity=".45"/></svg>
+
+<!-- La balle 3D qui voyage de section en section -->
+<div class="ball-layer" id="ball-layer" aria-hidden="true"></div>
 
 <header class="site-header">
   <div class="wrap header-inner">
@@ -40,13 +63,53 @@
     </a>
     <button class="nav-toggle" aria-expanded="false" aria-controls="nav">Menu</button>
     <nav id="nav" class="nav" aria-label="Navigation principale">
-      <a href="#club">Le club</a>
-      <a href="#equipes">Équipes</a>
-      <a href="#jeu">Tire au but</a>
-      <a href="#inscriptions">Inscriptions</a>
-      <a href="#arbitrage">Arbitrage</a>
-      <a href="#partenaires">Partenaires</a>
-      <a href="#contact">Contact</a>
+      <ul class="menu">
+        <li class="has-sub">
+          <button class="menu-btn" aria-expanded="false">Le club</button>
+          <ul class="sub">
+            <li><a href="#club">Présentation</a></li>
+            <li><a href="#histoire">Notre histoire</a></li>
+            <li><a class="ext" href="https://polohockeyclub.com/label/">Labels</a></li>
+            <li><a href="#acces">Accès</a></li>
+            <li><a href="#contact">Contact</a></li>
+          </ul>
+        </li>
+        <li class="has-sub">
+          <button class="menu-btn" aria-expanded="false">Sportif</button>
+          <ul class="sub">
+            <li><a href="#equipes">Les équipes premières</a></li>
+            <li><a class="ext" href="https://polohockeyclub.com/photos-des-equipes/">Photos des équipes</a></li>
+            <li><a class="ext" href="https://polohockeyclub.com/calendrier-et-resultats/">Calendrier et résultats</a></li>
+            <li><a class="ext" href="https://polohockeyclub.com/planning-des-entrainements/">Planning des entraînements</a></li>
+          </ul>
+        </li>
+        <li class="has-sub">
+          <button class="menu-btn" aria-expanded="false">Inscriptions</button>
+          <ul class="sub">
+            <li><a class="ext" href="https://polohockeyclub.com/inscriptions/">S'inscrire</a></li>
+            <li><a class="ext" href="https://polohockeyclub.com/saison-2026-2027/">Saison 2026-2027</a></li>
+            <li><a class="ext" href="https://polohockeyclub.com/stages-hockey-sur-gazon/">Stages</a></li>
+            <li><a class="ext" href="https://polohockeyclub.com/essai-hockey-sur-gazon/">Essai</a></li>
+            <li><a class="ext" href="https://polohockeyclub.com/accueil/foreign-students-in-lille/">Foreign students in Lille</a></li>
+          </ul>
+        </li>
+        <li class="has-sub">
+          <button class="menu-btn" aria-expanded="false">Boutique</button>
+          <ul class="sub">
+            <li><a class="ext" href="https://polohockeyclub.com/besoin-en-materiel-2/">Tenue et matériel</a></li>
+            <li><a class="ext" href="https://polohockeyclub.com/textile-polo/">Polo e-shop</a></li>
+          </ul>
+        </li>
+        <li class="has-sub">
+          <button class="menu-btn" aria-expanded="false">Arbitrage</button>
+          <ul class="sub">
+            <li><a href="#arbitrage">Académie de l'arbitrage</a></li>
+            <li><a class="ext" href="https://polohockeyclub.com/arbitres-en-formation-2024-2025/">Arbitres en formation 2024-2025</a></li>
+            <li><a class="ext" href="https://polohockeyclub.com/arbitres-en-formation-2023-2024/">Arbitres en formation 2023-2024</a></li>
+          </ul>
+        </li>
+        <li><a class="menu-link" href="#partenaires">Partenaires</a></li>
+      </ul>
       <a class="btn btn-yellow nav-cta" href="#essai">Réserver un essai</a>
     </nav>
   </div>
@@ -68,42 +131,84 @@
         <p class="hero-lead">Le plus grand club de hockey sur gazon de France&nbsp;: plus de 600 licenciés, des équipes en Élite et Nationale&nbsp;1, et une école de hockey ouverte aux filles et aux garçons dès 5&nbsp;ans.</p>
         <div class="hero-actions">
           <a class="btn btn-yellow" href="#essai">Réserver un essai</a>
-          <a class="btn btn-ghost" href="#inscriptions">S'inscrire pour 2026-2027</a>
+          <a class="btn btn-ghost" href="https://polohockeyclub.com/inscriptions/">S'inscrire pour 2026-2027</a>
         </div>
       </div>
 
       <figure class="hero-figure">
-        <svg viewBox="0 0 560 560" role="img" aria-labelledby="hero-cap">
-          <defs>
-            <clipPath id="arch">
-              <path d="M60 560 V280 A220 220 0 0 1 500 280 V560 Z"/>
-            </clipPath>
-          </defs>
-          <image class="hero-photo" href="assets/equipe-dames.jpg" x="60" y="30" width="440" height="560" preserveAspectRatio="xMidYMid slice" clip-path="url(#arch)"/>
-          <path class="shoe" d="M24 552 V280 A256 256 0 0 1 536 280 V552" />
-          <g class="nails">
-            <rect x="21" y="330" width="6" height="18" rx="3"/>
-            <rect x="21" y="420" width="6" height="18" rx="3"/>
-            <rect x="21" y="505" width="6" height="18" rx="3"/>
-            <rect x="533" y="330" width="6" height="18" rx="3"/>
-            <rect x="533" y="420" width="6" height="18" rx="3"/>
-            <rect x="533" y="505" width="6" height="18" rx="3"/>
-            <rect x="75" y="126" width="6" height="18" rx="3" transform="rotate(-48 78 135)"/>
-            <rect x="479" y="126" width="6" height="18" rx="3" transform="rotate(48 482 135)"/>
-          </g>
-        </svg>
+        <div class="crest" id="crest" role="img" aria-label="L'écusson du club en 3D : un fer à cheval doré traversé par une crosse, et la balle.">
+          <img class="crest-fallback" src="assets/logo-polo.png" alt="" width="560" height="560">
+          <span class="ball-stop ball-stop-hero" data-ball-stop></span>
+        </div>
         <ul class="badges">
           <li class="badge badge-season" data-depth="18">Saison 2026-2027</li>
           <li class="badge badge-city" data-depth="-14">Marcq-en-Barœul</li>
           <li class="badge badge-olymp" data-depth="10">Centre de préparation Paris 2024</li>
         </ul>
-        <figcaption id="hero-cap">L'équipe 1 Dames sur le terrain synthétique du Chemin Poivré.</figcaption>
+        <figcaption class="crest-hint">Attrapez l'écusson pour le faire tourner.</figcaption>
       </figure>
+    </div>
+  </section>
+
+  <!-- LIENS -->
+  <section class="section section-links" id="saison">
+    <span class="ball-stop stop-right" data-ball-stop></span>
+    <div class="wrap">
+      <h2>Votre saison au Polo</h2>
+      <p class="section-lead">Inscriptions, stages, planning, boutique&nbsp;: chaque tuile ouvre la page correspondante du site du club.</p>
+      <div class="tiles">
+        <a class="tile tile-main" href="https://polohockeyclub.com/inscriptions/">
+          <span class="tile-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V3h6v1"/><path d="M8.5 13l2.5 2.5 4.5-5"/></svg></span>
+          <span class="tile-title">Inscriptions</span>
+          <span class="tile-text">Payer la cotisation sur HelloAsso, lire le dossier et remplir le questionnaire de santé.</span>
+        </a>
+        <a class="tile" href="https://polohockeyclub.com/saison-2026-2027/">
+          <span class="tile-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg></span>
+          <span class="tile-title">Saison 2026-2027</span>
+          <span class="tile-text">Tout savoir sur la nouvelle saison.</span>
+        </a>
+        <a class="tile" href="https://polohockeyclub.com/essai-hockey-sur-gazon/">
+          <span class="tile-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M17 3 L9.5 16.5 Q7.8 20 5 19.2"/><circle cx="16" cy="18" r="2.6"/></svg></span>
+          <span class="tile-title">Essai</span>
+          <span class="tile-text">Découvrir le hockey dès 5&nbsp;ans.</span>
+        </a>
+        <a class="tile" href="https://polohockeyclub.com/stages-hockey-sur-gazon/">
+          <span class="tile-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3 L6.5 19 H17.5 Z"/><path d="M4 19.5h16M8.8 12.5h6.4"/></svg></span>
+          <span class="tile-title">Stages</span>
+          <span class="tile-text">Polo School et Polo Academy.</span>
+        </a>
+        <a class="tile tile-navy" href="https://polohockeyclub.com/planning-des-entrainements/">
+          <span class="tile-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg></span>
+          <span class="tile-title">Planning</span>
+          <span class="tile-text">Horaires des entraînements, en PDF.</span>
+        </a>
+        <a class="tile" href="https://polohockeyclub.com/calendrier-et-resultats/">
+          <span class="tile-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 4h8v5a4 4 0 0 1-8 0z"/><path d="M8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4M12 13v4M8.5 20h7M10 17h4"/></svg></span>
+          <span class="tile-title">Calendrier et résultats</span>
+          <span class="tile-text">Matchs et classements.</span>
+        </a>
+        <a class="tile" href="https://polohockeyclub.com/textile-polo/">
+          <span class="tile-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 3.5 L5 5.5 L3 10 l3 1.2 V20.5 h12 V11.2 l3-1.2 -2-4.5 -4-2 a3 3 0 0 1-6 0z"/></svg></span>
+          <span class="tile-title">Polo e-shop</span>
+          <span class="tile-text">Maillots et textile du club.</span>
+        </a>
+        <a class="tile" href="https://polohockeyclub.com/besoin-en-materiel-2/">
+          <span class="tile-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="8" width="16" height="12" rx="2.5"/><path d="M9 8V6a3 3 0 0 1 6 0v2M4 13h16"/></svg></span>
+          <span class="tile-title">Tenue et matériel</span>
+          <span class="tile-text">Ce qu'il faut dans le sac.</span>
+        </a>
+        <a class="tile tile-yellow" href="https://polohockeyclub.com/academie-de-larbitrage/">
+          <span class="tile-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="9" cy="14" r="5"/><path d="M12.5 10.5 L20 7v4.5l-5.2 1"/></svg></span>
+          <span class="tile-title">Arbitrage</span>
+          <span class="tile-text">L'académie des arbitres.</span>
+        </a>
+      </div>
     </div>
   </section>
 
   <!-- CLUB -->
   <section class="section" id="club">
+    <span class="ball-stop stop-left" data-ball-stop></span>
     <div class="wrap club-intro">
       <h2>Un club familial qui joue au plus haut niveau</h2>
       <div class="prose">
@@ -117,7 +222,7 @@
       </dl>
     </div>
 
-    <div class="wrap history">
+    <div class="wrap history" id="histoire">
       <h3 class="history-title">D'un terrain de polo au Chemin Poivré</h3>
       <ol class="timeline">
         <li><span class="year">1895</span><p>Les archives mentionnent déjà une section hockey sur gazon au Racing Club de Roubaix.</p></li>
@@ -134,16 +239,20 @@
       <article class="label card">
         <h3>Terre de Jeux 2024</h3>
         <p>Base d'entraînement officielle pour des équipes olympiques pendant Paris 2024. Le label invite tous les territoires à vivre les temps forts des Jeux et à faire bouger leurs habitants.</p>
+        <a class="more" href="https://polohockeyclub.com/label/">Voir nos labels</a>
       </article>
       <article class="label card">
         <h3>Sport et Femmes</h3>
         <p>Décerné en 2016 par le Comité départemental olympique et sportif pour notre engagement en faveur du hockey féminin&nbsp;: faciliter l'accès des filles et des femmes au jeu et aux responsabilités, mieux structurer l'offre sportive féminine, et adapter nos installations.</p>
+        <a class="more" href="https://polohockeyclub.com/label/">Voir nos labels</a>
       </article>
     </div>
   </section>
 
   <!-- ÉQUIPES -->
   <section class="section section-navy" id="equipes">
+    <div class="pitch-3d" aria-hidden="true"><svg><use href="#lignes-terrain"/></svg></div>
+    <span class="ball-stop stop-right" data-ball-stop></span>
     <div class="wrap">
       <h2>Les équipes premières</h2>
       <p class="section-lead">Deux équipes fanions, et derrière elles toutes les catégories jeunes, seniors et loisirs.</p>
@@ -165,87 +274,10 @@
     </div>
   </section>
 
-  <!-- JEU -->
-  <section class="section section-play" id="jeu">
-    <div class="wrap">
-      <div class="play-head">
-        <div>
-          <h2>Tire au but&nbsp;!</h2>
-          <p class="section-lead">Attends que la flèche vise le but, puis clique ou touche le terrain, ou appuie sur «&nbsp;Tirer&nbsp;». Attention, la gardienne va de plus en plus vite.</p>
-        </div>
-        <div class="scoreboard" aria-label="Tableau des scores">
-          <div><span class="sb-label">Toi</span><span class="sb-num" id="score-you">0</span></div>
-          <span class="sb-sep" aria-hidden="true">:</span>
-          <div><span class="sb-label">Gardienne</span><span class="sb-num" id="score-keeper">0</span></div>
-        </div>
-      </div>
-
-      <div class="pitch" id="pitch">
-        <svg viewBox="0 0 800 360" role="img" aria-label="Terrain de hockey : une crosse et une balle à gauche, une gardienne devant le but à droite.">
-          <defs>
-            <pattern id="filet" width="10" height="10" patternUnits="userSpaceOnUse">
-              <path d="M0 0 L10 10 M10 0 L0 10" stroke="rgba(255,255,255,.55)" stroke-width="1.2"/>
-            </pattern>
-          </defs>
-          <rect class="turf" width="800" height="360" rx="28"/>
-          <g class="stripes">
-            <rect x="0" width="100" height="360"/><rect x="200" width="100" height="360"/>
-            <rect x="400" width="100" height="360"/><rect x="600" width="100" height="360"/>
-          </g>
-          <g class="chalk">
-            <path d="M790 12 A168 168 0 0 0 790 348"/>
-            <path class="chalk-dash" d="M790 -40 A220 220 0 0 0 790 400"/>
-            <circle cx="652" cy="180" r="5" class="chalk-spot"/>
-            <line x1="790" y1="0" x2="790" y2="360"/>
-          </g>
-
-          <g class="goal" id="goal">
-            <rect x="772" y="98" width="26" height="164" fill="url(#filet)"/>
-            <path d="M798 98 H772 V262 H798" class="goal-frame"/>
-          </g>
-
-          <g class="keeper" id="keeper"><g transform="translate(722 0) scale(1.45) translate(-722 0)">
-            <ellipse cx="722" cy="36" rx="20" ry="7" class="keeper-shadow"/>
-            <rect x="706" y="-6" width="34" height="40" rx="14" class="keeper-body"/>
-            <rect x="700" y="26" width="16" height="14" rx="7" class="keeper-kicker"/>
-            <rect x="728" y="26" width="16" height="14" rx="7" class="keeper-kicker"/>
-            <circle cx="723" cy="-20" r="17" class="keeper-helmet"/>
-            <circle cx="716" cy="-20" r="2.6" class="keeper-eye"/>
-            <circle cx="729" cy="-20" r="2.6" class="keeper-eye"/>
-            <path d="M708 -24 H738 M708 -16 H738 M715 -30 V-8 M723 -32 V-6 M731 -30 V-8" class="keeper-grille"/>
-            <rect x="692" y="0" width="14" height="24" rx="7" class="keeper-glove"/>
-          </g></g>
-
-          <g class="aim" id="aim">
-            <line x1="26" y1="0" x2="150" y2="0"/>
-            <path d="M150 -10 L168 0 L150 10 Z"/>
-          </g>
-
-          <g id="ball">
-            <g class="spin"><use href="#balle" x="-16" y="-16" width="32" height="32"/></g>
-            <circle cx="-5" cy="-7" r="4" fill="#fff" opacity=".45"/>
-          </g>
-
-          <g class="stick" id="stick">
-            <circle cx="64" cy="58" r="11" class="stick-hand"/>
-            <path d="M66 50 L119 172 Q125 190 140 193 Q148 194 147 187" class="stick-outline"/>
-            <path d="M66 50 L119 172 Q125 190 140 193 Q148 194 147 187" class="stick-shaft"/>
-            <path d="M66 50 L80 82" class="stick-grip"/>
-          </g>
-        </svg>
-        <p class="pitch-pop" id="pitch-pop" aria-hidden="true">But&nbsp;!</p>
-      </div>
-
-      <div class="play-foot">
-        <button class="btn btn-yellow btn-shoot" id="shoot" type="button">Tirer</button>
-        <p class="play-msg" id="play-msg" role="status" aria-live="polite">Vise le but et tire&nbsp;!</p>
-        <a class="play-cta" href="#essai">Envie de marquer pour de vrai&nbsp;? Réserver un essai</a>
-      </div>
-    </div>
-  </section>
-
   <!-- ESSAI -->
   <section class="section section-turf" id="essai">
+    <div class="pitch-3d" aria-hidden="true"><svg><use href="#lignes-terrain"/></svg></div>
+    <span class="ball-stop stop-left" data-ball-stop></span>
     <div class="wrap essai-grid">
       <div>
         <h2>Venir essayer le hockey</h2>
@@ -255,6 +287,7 @@
           <a class="btn btn-yellow" href="tel:+33661418197">Appeler le 06 61 41 81 97</a>
           <a class="btn btn-chalk" href="mailto:polohockeyclub@gmail.com?subject=Essai%20hockey%20sur%20gazon">Écrire un e-mail</a>
         </div>
+        <p class="essai-more"><a href="https://polohockeyclub.com/essai-hockey-sur-gazon/">Toutes les infos sur les essais</a></p>
       </div>
       <div class="bag card">
         <h3>Dans le sac pour la première séance</h3>
@@ -272,6 +305,7 @@
 
   <!-- INSCRIPTIONS -->
   <section class="section" id="inscriptions">
+    <span class="ball-stop stop-right" data-ball-stop></span>
     <div class="wrap">
       <h2>S'inscrire pour la saison 2026-2027</h2>
       <p class="section-lead">La licence est valable du 1<sup>er</sup> septembre au 30 juin. Les renouvellements sont prioritaires jusqu'au 15 mai&nbsp;; les nouveaux joueurs sont prévenus fin mai.</p>
@@ -306,14 +340,21 @@
         </div>
       </div>
 
+      <div class="inscription-actions">
+        <a class="btn btn-navy" href="https://polohockeyclub.com/inscriptions/">Voir la page Inscriptions</a>
+        <a class="btn btn-outline" href="https://polohockeyclub.com/saison-2026-2027/">Saison 2026-2027</a>
+      </div>
+
       <div class="extras">
         <article class="card">
           <h3>Stages Polo School et Polo Academy</h3>
           <p>Dates et programmes des stages sont envoyés sur l'application TeamPulse et par votre parent relais.</p>
+          <a class="more" href="https://polohockeyclub.com/stages-hockey-sur-gazon/">Page des stages</a>
         </article>
         <article class="card">
           <h3>Foreign students in Lille</h3>
           <p lang="en">Studying in Lille and share our values of family, fun and work? Our first and second teams play at the highest level in France. Email us or call +33 6 61 41 81 97 and tell us a bit about yourself.</p>
+          <a class="more" lang="en" href="https://polohockeyclub.com/accueil/foreign-students-in-lille/">Read more</a>
         </article>
       </div>
     </div>
@@ -322,17 +363,23 @@
   <!-- TENUE -->
   <section class="section section-mist" id="tenue">
     <div class="wrap kit-grid">
+      <div class="kit-stage">
+        <div class="kit3d" id="kit3d" role="img" aria-label="La tenue du Polo en 3D : maillot jaune, short marine, chaussettes et chaussures.">
+          <span class="ball-stop stop-kit" data-ball-stop></span>
+        </div>
+        <div class="kit-toggle" role="group" aria-label="Choisir la tenue">
+          <button type="button" aria-pressed="true" data-kit="match">Tenue de match</button>
+          <button type="button" aria-pressed="false" data-kit="training">Entraînement</button>
+        </div>
+      </div>
       <div>
         <h2>La tenue du Polo</h2>
-        <p class="section-lead">Le jaune, c'est pour les matchs. À l'entraînement, chaussettes marine.</p>
+        <p class="section-lead" id="kit-caption">Le jaune, c'est pour les matchs. À l'entraînement, chaussettes marine.</p>
         <ul class="kit">
           <li><span class="swatch swatch-yellow" aria-hidden="true"></span>Maillot jaune logoté</li>
           <li><span class="swatch swatch-navy" aria-hidden="true"></span>Short ou jupe-short marine</li>
           <li><span class="swatch swatch-split" aria-hidden="true"></span>Chaussettes jaunes, marine à l'entraînement</li>
         </ul>
-        <a class="btn btn-navy" href="https://polohockeyclub.com/textile-polo/">Commander sur le Polo e-shop</a>
-      </div>
-      <div>
         <h3>Matériel obligatoire</h3>
         <ul class="checklist checklist-dark">
           <li>Une crosse de hockey</li>
@@ -341,6 +388,10 @@
           <li>Des chaussures pour synthétique, sans crampons (baskets pour les plus jeunes)</li>
           <li>Une gourde personnelle, à chaque séance et chaque match</li>
         </ul>
+        <div class="kit-actions">
+          <a class="btn btn-navy" href="https://polohockeyclub.com/textile-polo/">Commander sur le Polo e-shop</a>
+          <a class="more" href="https://polohockeyclub.com/besoin-en-materiel-2/">Page tenue et matériel</a>
+        </div>
         <p class="muted">Équipement et textile en partenariat avec Hockey Player.</p>
       </div>
     </div>
@@ -348,11 +399,17 @@
 
   <!-- ARBITRAGE -->
   <section class="section" id="arbitrage">
+    <span class="ball-stop stop-left" data-ball-stop></span>
     <div class="wrap arb-grid">
       <div>
         <h2>Académie de l'arbitrage</h2>
         <p class="section-lead">Notre objectif&nbsp;: que chaque match soit sifflé par des arbitres formés.</p>
         <p>L'académie fait progresser la connaissance des règles à tous les niveaux et accompagne les arbitres, en particulier les jeunes en formation. Elle est ouverte à tous ceux qui veulent mieux arbitrer, pour eux-mêmes, pour le club ou pour viser une carrière d'arbitre national.</p>
+        <p class="arb-links">
+          <a href="https://polohockeyclub.com/academie-de-larbitrage/">Page de l'académie</a>
+          <a href="https://polohockeyclub.com/arbitres-en-formation-2024-2025/">Arbitres en formation 2024-2025</a>
+          <a href="https://polohockeyclub.com/arbitres-en-formation-2023-2024/">Arbitres en formation 2023-2024</a>
+        </p>
       </div>
       <ul class="people">
         <li class="card">
@@ -371,6 +428,7 @@
 
   <!-- PARTENAIRES -->
   <section class="section section-navy" id="partenaires">
+    <span class="ball-stop stop-right" data-ball-stop></span>
     <div class="wrap">
       <h2>Ils soutiennent le Polo</h2>
       <p class="section-lead">Merci à l'ensemble des partenaires qui soutiennent le club dans son projet.</p>
@@ -393,50 +451,71 @@
         <li><a href="http://www.sunnystore.fr">Sunny Store</a></li>
         <li><a href="https://www.seize-immobilier.com">Seize Immobilier</a></li>
       </ul>
-      <p class="partners-cta">Votre entreprise souhaite rejoindre l'aventure&nbsp;? <a href="#contact">Parlons-en</a>.</p>
+      <p class="partners-cta">Votre entreprise souhaite rejoindre l'aventure&nbsp;? <a href="#contact">Parlons-en</a> ou <a href="https://polohockeyclub.com/les-partenaires-du-polo/">voir la page partenaires</a>.</p>
     </div>
   </section>
 
-  <!-- CONTACT -->
+  <!-- ACCÈS ET CONTACT -->
   <section class="section" id="contact">
-    <div class="wrap contact-grid">
-      <div>
-        <h2>Nous trouver</h2>
-        <address>
-          <strong>Polo Hockey Club</strong><br>
-          200 Chemin Poivré<br>
-          59700 Marcq-en-Barœul
-        </address>
-        <p class="contact-lines">
-          <a href="mailto:polohockeyclub@gmail.com">polohockeyclub@gmail.com</a><br>
-          <a href="tel:+33661418197">06 61 41 81 97</a>
-        </p>
-        <div class="map">
-          <iframe title="Plan d'accès au Polo Hockey Club" src="https://www.google.com/maps?q=200+Chemin+Poivr%C3%A9,+59700+Marcq-en-Bar%C5%93ul&output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+    <span class="ball-stop stop-left" data-ball-stop></span>
+    <div class="wrap">
+      <div class="access" id="acces">
+        <div class="access-head">
+          <h2>Venir au Chemin Poivré</h2>
+          <p class="section-lead">Faites pivoter la maquette et touchez un repère pour en savoir plus. C'est une maquette stylisée, pas un plan à l'échelle.</p>
+        </div>
+        <div class="map-wrap">
+          <div class="map3d" id="map3d">
+            <div class="map-pins">
+              <button type="button" class="pin" data-spot="terrain" aria-pressed="false">Terrain</button>
+              <button type="button" class="pin" data-spot="clubhouse" aria-pressed="false">Club-house</button>
+              <button type="button" class="pin" data-spot="parking" aria-pressed="false">Parking</button>
+              <button type="button" class="pin" data-spot="entree" aria-pressed="false">Entrée</button>
+            </div>
+          </div>
+          <aside class="map-info" id="map-info" aria-live="polite">
+            <h3 id="map-info-title">200 Chemin Poivré</h3>
+            <p id="map-info-text">59700 Marcq-en-Barœul, au sein de l'Hippodrome des Flandres. Touchez un repère sur la maquette pour découvrir les installations.</p>
+            <p class="contact-lines">
+              <a href="mailto:polohockeyclub@gmail.com">polohockeyclub@gmail.com</a><br>
+              <a href="tel:+33661418197">06 61 41 81 97</a>
+            </p>
+            <a class="btn btn-navy" href="https://www.google.com/maps/dir/?api=1&amp;destination=200+Chemin+Poivr%C3%A9+59700+Marcq-en-Bar%C5%93ul">Ouvrir l'itinéraire</a>
+          </aside>
         </div>
       </div>
 
-      <form class="contact-form" id="contact-form" novalidate>
-        <h2>Nous écrire</h2>
-        <div class="row">
-          <label>Prénom<input name="prenom" autocomplete="given-name"></label>
-          <label>Nom<input name="nom" autocomplete="family-name" required></label>
+      <div class="contact-grid">
+        <div>
+          <h2>Nous écrire</h2>
+          <p class="section-lead">Une question sur une inscription, un essai, un partenariat&nbsp;? Le secrétariat vous répond.</p>
+          <address>
+            <strong>Polo Hockey Club</strong><br>
+            200 Chemin Poivré<br>
+            59700 Marcq-en-Barœul
+          </address>
         </div>
-        <label>E-mail<input type="email" name="email" autocomplete="email" required></label>
-        <label>Votre demande
-          <select name="demande">
-            <option>Inscription</option>
-            <option>Essai</option>
-            <option>Rencontrer une équipe</option>
-            <option>Partenariat</option>
-            <option>Autre</option>
-          </select>
-        </label>
-        <label>Message<textarea name="message" rows="5" required></textarea></label>
-        <p class="form-error" role="alert" hidden></p>
-        <button class="btn btn-navy" type="submit">Envoyer le message</button>
-        <p class="muted small">Le bouton ouvre votre messagerie avec le message prérempli, adressé à polohockeyclub@gmail.com.</p>
-      </form>
+        <form class="contact-form" id="contact-form" novalidate>
+          <div class="row">
+            <label>Prénom<input name="prenom" autocomplete="given-name"></label>
+            <label>Nom<input name="nom" autocomplete="family-name" required></label>
+          </div>
+          <label>E-mail<input type="email" name="email" autocomplete="email" required></label>
+          <label>Votre demande
+            <select name="demande">
+              <option>Inscription</option>
+              <option>Essai</option>
+              <option>Rencontrer une équipe</option>
+              <option>Partenariat</option>
+              <option>Autre</option>
+            </select>
+          </label>
+          <label>Message<textarea name="message" rows="5" required></textarea></label>
+          <p class="form-error" role="alert" hidden></p>
+          <button class="btn btn-navy" type="submit">Envoyer le message</button>
+          <p class="muted small">Le bouton ouvre votre messagerie avec le message prérempli, adressé à polohockeyclub@gmail.com.</p>
+        </form>
+      </div>
     </div>
   </section>
 
@@ -448,16 +527,29 @@
       <img src="assets/logo-polo.png" alt="Écusson du Polo Hockey Club Marcq" width="72" height="72">
       <p>#WeArePolo</p>
     </div>
+    <div class="footer-goal" id="footer-goal" aria-hidden="true">
+      <svg viewBox="0 0 160 110">
+        <defs>
+          <pattern id="filet-pied" width="10" height="10" patternUnits="userSpaceOnUse">
+            <path d="M0 0 L10 10 M10 0 L0 10" stroke="rgba(255,255,255,.4)" stroke-width="1.2"/>
+          </pattern>
+        </defs>
+        <path class="goal-net" d="M20 20 L140 20 L150 100 L10 100 Z" fill="url(#filet-pied)"/>
+        <path d="M10 100 V14 H150 V100" fill="none" stroke="#fff" stroke-width="6" stroke-linejoin="round"/>
+        <line x1="0" y1="102" x2="160" y2="102" stroke="rgba(255,255,255,.5)" stroke-width="3"/>
+      </svg>
+      <span class="ball-stop stop-goal" data-ball-stop></span>
+    </div>
     <ul class="footer-social">
       <li><a href="https://www.instagram.com/polohockeyclub/">Instagram</a></li>
       <li><a href="https://www.facebook.com/Polo-Hockey-Club-214764817017">Facebook</a></li>
       <li><a href="https://www.linkedin.com/company/polo-hockey-club-marcq-en-baroeul">LinkedIn</a></li>
     </ul>
-    <p class="footer-legal">© Polo Hockey Club Marcq-en-Barœul, fondé en 1932</p>
+    <p class="footer-legal">© Polo Hockey Club Marcq-en-Barœul, fondé en 1932. <a href="https://polohockeyclub.com/">Site historique du club</a></p>
   </div>
 </footer>
 
 <script src="js/main.js"></script>
-<script src="js/jeu.js"></script>
+<script type="module" src="js/3d/index.js"></script>
 </body>
 </html>

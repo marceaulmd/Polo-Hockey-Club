@@ -19,7 +19,7 @@ nav.addEventListener('click', (e) => {
 
 // Défilement : navigation en verre, barre de progression, parallaxe du hero
 const header = document.querySelector('.site-header');
-const progress = document.querySelector('.progress span');
+const progress = document.querySelector('.progress');
 const hero = document.querySelector('.hero');
 const heroPitch = document.querySelector('.hero-pitch');
 const heroText = document.querySelector('.hero-text');
@@ -76,7 +76,7 @@ if (!reduceMotion && 'IntersectionObserver' in window) {
     ['.prose p, .facts > div', 'reveal'],
     ['.timeline li', 'reveal-line'],
     ['.labels > .card, .teams > .card, .steps > .card, .extras > .card, .people > .card', 'reveal'],
-    ['.docs, .bag, .kit li, .checklist li, .team-links, .map, .contact-form, address', 'reveal'],
+    ['.pitch, .scoreboard, .docs, .bag, .kit li, .checklist li, .team-links, .map, .contact-form, address', 'reveal'],
     ['.partners li', 'reveal'],
   ];
 
@@ -118,25 +118,41 @@ if (finePointer) {
   });
 }
 
-// Balle qui suit le curseur
+// La crosse (curseur) dribble une balle : elle suit la souris et part au clic
 if (!reduceMotion && finePointer) {
-  const ball = document.querySelector('.cursor-ball');
-  let x = -100, y = -100, bx = -100, by = -100;
+  const ball = document.querySelector('.dribble');
+  const spin = ball.querySelector('.spin');
+  const R = 8; // rayon affiché en px
+  let tx = -100, ty = -100;      // position visée : juste devant la palette de la crosse
+  let x = -100, y = -100;        // position de la balle
+  let vx = 0, vy = 0, angle = 0;
+  let lastX = 0, lastY = 0, dirX = 1, dirY = 0;
 
   window.addEventListener('pointermove', (e) => {
-    x = e.clientX; y = e.clientY;
+    const dx = e.clientX - lastX, dy = e.clientY - lastY;
+    const len = Math.hypot(dx, dy);
+    if (len > 2) { dirX = dx / len; dirY = dy / len; }
+    lastX = e.clientX; lastY = e.clientY;
+    tx = e.clientX + 9; ty = e.clientY - 2;
+    if (!ball.classList.contains('is-visible')) { x = tx; y = ty; }
     ball.classList.add('is-visible');
-    ball.classList.toggle('is-hover', !!e.target.closest('a, button, input, select, textarea, label, .card'));
   }, { passive: true });
-  document.addEventListener('pointerleave', () => ball.classList.remove('is-visible'));
-  window.addEventListener('pointerdown', () => ball.classList.add('is-down'));
-  window.addEventListener('pointerup', () => ball.classList.remove('is-down'));
+  document.documentElement.addEventListener('pointerleave', () => ball.classList.remove('is-visible'));
 
-  (function follow() {
-    bx += (x - bx) * 0.2;
-    by += (y - by) * 0.2;
-    ball.style.transform = `translate3d(${bx}px, ${by}px, 0)`;
-    requestAnimationFrame(follow);
+  // Un clic frappe la balle dans le sens du mouvement
+  window.addEventListener('pointerdown', (e) => {
+    if (e.target.closest('input, textarea, select, .pitch')) return;
+    vx += dirX * 26; vy += dirY * 26;
+  });
+
+  (function dribble() {
+    vx += (tx - x) * 0.05; vy += (ty - y) * 0.05;
+    vx *= 0.82; vy *= 0.82;
+    x += vx; y += vy;
+    angle += (vx / R) * (180 / Math.PI) * 0.5;
+    ball.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+    spin.style.transform = `rotate(${angle}deg)`;
+    requestAnimationFrame(dribble);
   })();
 }
 

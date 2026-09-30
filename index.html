@@ -15,8 +15,22 @@
 
 <a class="skip" href="#contenu">Aller au contenu</a>
 
-<div class="progress" aria-hidden="true"><span></span></div>
-<div class="cursor-ball" aria-hidden="true"></div>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="balle" viewBox="-12 -12 24 24">
+    <circle r="11" fill="#F5B315" stroke="#0B416F" stroke-width="1.6"/>
+    <g fill="#C98A00">
+      <circle cy="-6" r="1.7"/><circle cx="5.2" cy="-3" r="1.7"/><circle cx="5.2" cy="3" r="1.7"/>
+      <circle cy="6" r="1.7"/><circle cx="-5.2" cy="3" r="1.7"/><circle cx="-5.2" cy="-3" r="1.7"/>
+      <circle r="1.7"/>
+    </g>
+  </symbol>
+</svg>
+
+<div class="progress" aria-hidden="true">
+  <span class="progress-line"></span>
+  <svg class="progress-ball" viewBox="-12 -12 24 24"><g class="spin"><use href="#balle"/></g><circle cx="-4" cy="-5" r="3" fill="#fff" opacity=".45"/></svg>
+</div>
+<svg class="dribble" viewBox="-12 -12 24 24" aria-hidden="true"><g class="spin"><use href="#balle"/></g><circle cx="-4" cy="-5" r="3" fill="#fff" opacity=".45"/></svg>
 
 <header class="site-header">
   <div class="wrap header-inner">
@@ -28,6 +42,7 @@
     <nav id="nav" class="nav" aria-label="Navigation principale">
       <a href="#club">Le club</a>
       <a href="#equipes">Équipes</a>
+      <a href="#jeu">Tire au but</a>
       <a href="#inscriptions">Inscriptions</a>
       <a href="#arbitrage">Arbitrage</a>
       <a href="#partenaires">Partenaires</a>
@@ -146,6 +161,85 @@
         <a href="https://polohockeyclub.com/calendrier-et-resultats/">Calendrier et résultats</a>
         <a href="https://polohockeyclub.com/planning-des-entrainements/">Planning des entraînements 2026-2027 (PDF)</a>
         <a href="https://polohockeyclub.com/photos-des-equipes/">Photos de toutes les équipes</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- JEU -->
+  <section class="section section-play" id="jeu">
+    <div class="wrap">
+      <div class="play-head">
+        <div>
+          <h2>Tire au but&nbsp;!</h2>
+          <p class="section-lead">Attends que la flèche vise le but, puis clique ou touche le terrain, ou appuie sur «&nbsp;Tirer&nbsp;». Attention, la gardienne va de plus en plus vite.</p>
+        </div>
+        <div class="scoreboard" aria-label="Tableau des scores">
+          <div><span class="sb-label">Toi</span><span class="sb-num" id="score-you">0</span></div>
+          <span class="sb-sep" aria-hidden="true">:</span>
+          <div><span class="sb-label">Gardienne</span><span class="sb-num" id="score-keeper">0</span></div>
+        </div>
+      </div>
+
+      <div class="pitch" id="pitch">
+        <svg viewBox="0 0 800 360" role="img" aria-label="Terrain de hockey : une crosse et une balle à gauche, une gardienne devant le but à droite.">
+          <defs>
+            <pattern id="filet" width="10" height="10" patternUnits="userSpaceOnUse">
+              <path d="M0 0 L10 10 M10 0 L0 10" stroke="rgba(255,255,255,.55)" stroke-width="1.2"/>
+            </pattern>
+          </defs>
+          <rect class="turf" width="800" height="360" rx="28"/>
+          <g class="stripes">
+            <rect x="0" width="100" height="360"/><rect x="200" width="100" height="360"/>
+            <rect x="400" width="100" height="360"/><rect x="600" width="100" height="360"/>
+          </g>
+          <g class="chalk">
+            <path d="M790 12 A168 168 0 0 0 790 348"/>
+            <path class="chalk-dash" d="M790 -40 A220 220 0 0 0 790 400"/>
+            <circle cx="652" cy="180" r="5" class="chalk-spot"/>
+            <line x1="790" y1="0" x2="790" y2="360"/>
+          </g>
+
+          <g class="goal" id="goal">
+            <rect x="772" y="98" width="26" height="164" fill="url(#filet)"/>
+            <path d="M798 98 H772 V262 H798" class="goal-frame"/>
+          </g>
+
+          <g class="keeper" id="keeper"><g transform="translate(722 0) scale(1.45) translate(-722 0)">
+            <ellipse cx="722" cy="36" rx="20" ry="7" class="keeper-shadow"/>
+            <rect x="706" y="-6" width="34" height="40" rx="14" class="keeper-body"/>
+            <rect x="700" y="26" width="16" height="14" rx="7" class="keeper-kicker"/>
+            <rect x="728" y="26" width="16" height="14" rx="7" class="keeper-kicker"/>
+            <circle cx="723" cy="-20" r="17" class="keeper-helmet"/>
+            <circle cx="716" cy="-20" r="2.6" class="keeper-eye"/>
+            <circle cx="729" cy="-20" r="2.6" class="keeper-eye"/>
+            <path d="M708 -24 H738 M708 -16 H738 M715 -30 V-8 M723 -32 V-6 M731 -30 V-8" class="keeper-grille"/>
+            <rect x="692" y="0" width="14" height="24" rx="7" class="keeper-glove"/>
+          </g></g>
+
+          <g class="aim" id="aim">
+            <line x1="26" y1="0" x2="150" y2="0"/>
+            <path d="M150 -10 L168 0 L150 10 Z"/>
+          </g>
+
+          <g id="ball">
+            <g class="spin"><use href="#balle" x="-16" y="-16" width="32" height="32"/></g>
+            <circle cx="-5" cy="-7" r="4" fill="#fff" opacity=".45"/>
+          </g>
+
+          <g class="stick" id="stick">
+            <circle cx="64" cy="58" r="11" class="stick-hand"/>
+            <path d="M66 50 L119 172 Q125 190 140 193 Q148 194 147 187" class="stick-outline"/>
+            <path d="M66 50 L119 172 Q125 190 140 193 Q148 194 147 187" class="stick-shaft"/>
+            <path d="M66 50 L80 82" class="stick-grip"/>
+          </g>
+        </svg>
+        <p class="pitch-pop" id="pitch-pop" aria-hidden="true">But&nbsp;!</p>
+      </div>
+
+      <div class="play-foot">
+        <button class="btn btn-yellow btn-shoot" id="shoot" type="button">Tirer</button>
+        <p class="play-msg" id="play-msg" role="status" aria-live="polite">Vise le but et tire&nbsp;!</p>
+        <a class="play-cta" href="#essai">Envie de marquer pour de vrai&nbsp;? Réserver un essai</a>
       </div>
     </div>
   </section>
@@ -364,5 +458,6 @@
 </footer>
 
 <script src="js/main.js"></script>
+<script src="js/jeu.js"></script>
 </body>
 </html>

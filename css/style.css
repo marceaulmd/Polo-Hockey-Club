@@ -312,10 +312,10 @@ html:not(.has-3d) .crest-hint { display: none; }
   content: ""; width: 9px; height: 9px; border-radius: 50%; flex: none;
   background: var(--maillot);
 }
-.badge-season { top: 10%; left: 0; background: var(--maillot); color: var(--encre); border-color: transparent; }
+.badge-season { top: 6%; left: -12%; background: var(--maillot); color: var(--encre); border-color: transparent; }
 .badge-season::before { background: var(--marine); }
-.badge-city { top: 40%; right: -2%; }
-.badge-olymp { bottom: 14%; left: -2%; }
+.badge-city { top: 46%; right: -14%; }
+.badge-olymp { bottom: 10%; left: -14%; }
 
 @media (prefers-reduced-motion: no-preference) {
   .js .badge { animation: badge-in .7s cubic-bezier(.2, .8, .2, 1.2) both, float 6s ease-in-out infinite; }
@@ -340,6 +340,9 @@ html:not(.has-3d) .crest-hint { display: none; }
   .hero-grid { grid-template-columns: 1fr; }
   .hero-figure { max-width: 460px; width: 100%; margin-inline: auto; }
   .badge { font-size: 0.8125rem; padding: 8px 12px 8px 10px; }
+  .badge-season { left: 0; }
+  .badge-city { right: 0; }
+  .badge-olymp { left: 0; }
 }
 
 /* ============ Sections ============ */

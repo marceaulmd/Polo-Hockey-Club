@@ -1,6 +1,9 @@
 import * as THREE from 'three';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 
+// État de l'écusson, lu par la balle voyageuse (rotation, fin de l'animation d'entrée)
+export const crestState = { tilt: 0, ready: false };
+
 export const COLORS = {
   marine: 0x0B416F,
   marineDeep: 0x072C4C,

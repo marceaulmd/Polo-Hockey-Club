@@ -74,7 +74,7 @@ function onScroll() {
   header.classList.toggle('is-scrolled', y > 24);
   progress.style.setProperty('--p', max > 0 ? Math.min(1, y / max) : 0);
 
-  if (!reduceMotion && y < hero.offsetHeight) {
+  if (hero && !reduceMotion && y < hero.offsetHeight) {
     heroPitch.style.transform = `translate3d(0, ${y * 0.35}px, 0)`;
     heroText.style.transform = `translate3d(0, ${y * 0.18}px, 0)`;
     heroText.style.opacity = Math.max(0, 1 - y / (hero.offsetHeight * 0.9));
@@ -89,7 +89,7 @@ window.addEventListener('resize', onScroll);
 onScroll();
 
 // Badges du hero : légère profondeur qui suit la souris
-if (!reduceMotion && finePointer) {
+if (hero && !reduceMotion && finePointer) {
   const badges = document.querySelectorAll('.badge');
   hero.addEventListener('pointermove', (e) => {
     const r = hero.getBoundingClientRect();
@@ -151,6 +151,8 @@ if (!reduceMotion && 'IntersectionObserver' in window) {
     ['.tiles > .tile, .labels > .card, .teams > .card, .steps > .card, .extras > .card, .people > .card', 'reveal'],
     ['.kit-stage, .map-wrap, .docs, .bag, .kit li, .team-links, .contact-form, address', 'reveal'],
     ['.partners li', 'reveal'],
+    ['.page-section h2, .page-section > .wrap > .section-lead', 'reveal'],
+    ['.blocks > .block, .slots > .slot, .shops > .shop, .quotes > .quote, .gallery > li, .docs-list > li, .dates > li, .table-wrap, .note', 'reveal'],
   ];
 
   const observer = new IntersectionObserver((entries) => {
@@ -193,28 +195,76 @@ if (finePointer) {
 
 // Formulaire de contact : ouvre la messagerie avec un message prérempli
 const form = document.getElementById('contact-form');
-const error = form.querySelector('.form-error');
+if (form) {
+  const error = form.querySelector('.form-error');
 
-form.addEventListener('submit', (e) => {
-  e.preventDefault();
-  const missing = [];
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const missing = [];
 
-  form.querySelectorAll('[required]').forEach((field) => {
-    const invalid = !field.value.trim() || (field.type === 'email' && !field.checkValidity());
-    field.setAttribute('aria-invalid', invalid);
-    if (invalid) missing.push(field.closest('label').firstChild.textContent.trim());
+    form.querySelectorAll('[required]').forEach((field) => {
+      const invalid = !field.value.trim() || (field.type === 'email' && !field.checkValidity());
+      field.setAttribute('aria-invalid', invalid);
+      if (invalid) missing.push(field.closest('label').firstChild.textContent.trim());
+    });
+
+    if (missing.length) {
+      error.textContent = `Complétez ces champs pour envoyer votre message : ${missing.join(', ')}.`;
+      error.hidden = false;
+      form.querySelector('[aria-invalid="true"]').focus();
+      return;
+    }
+    error.hidden = true;
+
+    const d = Object.fromEntries(new FormData(form));
+    const subject = `${d.demande} – ${d.prenom} ${d.nom}`.trim();
+    const body = `${d.message}\n\n${d.prenom} ${d.nom}\n${d.email}`;
+    window.location.href = `mailto:polohockeyclub@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   });
+}
 
-  if (missing.length) {
-    error.textContent = `Complétez ces champs pour envoyer votre message : ${missing.join(', ')}.`;
-    error.hidden = false;
-    form.querySelector('[aria-invalid="true"]').focus();
-    return;
+// Planning : trouver le créneau de son enfant selon son année de naissance
+const finder = document.getElementById('finder-year');
+if (finder) {
+  const out = document.getElementById('finder-result');
+  const slots = [...document.querySelectorAll('.slot[data-years]')];
+  finder.addEventListener('change', () => {
+    const year = finder.value;
+    const matches = slots.filter((s) => s.dataset.years.split(' ').includes(year));
+    slots.forEach((s) => s.classList.toggle('is-match', matches.includes(s)));
+    document.querySelectorAll('.slots').forEach((g) => g.classList.toggle('is-filtered', !!year));
+    if (!year) { out.textContent = ''; return; }
+    out.textContent = matches.length
+      ? `${matches.length} créneau${matches.length > 1 ? 'x' : ''} pour les enfants nés en ${year}.`
+      : `Aucun créneau jeunes pour ${year} : voyez avec le club pour les équipes seniors et loisirs.`;
+    if (matches[0]) matches[0].scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' });
+  });
+}
+
+// Stages : les dates déjà passées sont signalées automatiquement
+document.querySelectorAll('.dates li[data-end]').forEach((li) => {
+  const end = new Date(`${li.dataset.end}T23:59:59`);
+  if (end < new Date()) {
+    li.classList.add('is-past');
+    const tag = li.querySelector('.tag');
+    if (tag) tag.textContent = 'Terminé';
   }
-  error.hidden = true;
-
-  const d = Object.fromEntries(new FormData(form));
-  const subject = `${d.demande} – ${d.prenom} ${d.nom}`.trim();
-  const body = `${d.message}\n\n${d.prenom} ${d.nom}\n${d.email}`;
-  window.location.href = `mailto:polohockeyclub@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 });
+
+// Galerie : agrandir une photo
+const lightbox = document.getElementById('lightbox');
+if (lightbox && typeof lightbox.showModal === 'function') {
+  const img = lightbox.querySelector('img');
+  const caption = lightbox.querySelector('p');
+  document.querySelectorAll('.gallery button').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const thumb = btn.querySelector('img');
+      img.src = thumb.src;
+      img.alt = thumb.alt;
+      caption.textContent = thumb.alt;
+      lightbox.showModal();
+    });
+  });
+  lightbox.querySelector('.btn').addEventListener('click', () => lightbox.close());
+  lightbox.addEventListener('click', (e) => { if (e.target === lightbox) lightbox.close(); });
+}
